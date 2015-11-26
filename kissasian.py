@@ -32,10 +32,12 @@ def kissDrama(browser, mainLink):
 		downloadFile(idmPath, videoTag.get_attribute("src"), folderName, browser.title.split(" -")[0] + ".mp4")
 
 def downloadFile(idmPath, downloadLink, folder, fileName):
-		call([idmPath, "/d", downloadLink, "/n", "/a", "/f", fileName])
+		call([idmPath, "/d", downloadLink, "/n", "/s", "/f", fileName])
 
 def kissAnime(browser, mainLink):
 	browser.get(mainLink)
+	folderName = browser.find_element_by_class_name("bigChar").text
+
 	episodeTable = browser.find_elements_by_class_name("listing")[0].find_elements(By.TAG_NAME, "a")
 
 	episodeLinks = []
