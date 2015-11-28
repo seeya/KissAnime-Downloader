@@ -1,3 +1,4 @@
+import re
 import sys
 from urlparse import urlparse
 from subprocess import call
@@ -14,7 +15,8 @@ idmPath = "C:\Program Files (x86)\Internet Download Manager\IDMan.exe"
 def kissDrama(browser, mainLink):
 	print "Getting Total Number Of Episodes..."
 	browser.get(mainLink);
-	folderName = browser.find_element_by_class_name("bigChar").text
+	folderName = mainLink[::-1].split("/")[0][::-1]
+
 	episodeList = browser.find_elements_by_class_name("episodeSub")
 
 	episodeLinks = []
@@ -24,19 +26,19 @@ def kissDrama(browser, mainLink):
 
 	print "Found: " + str(len(episodeLinks))
 
-	for link in episodeLinks:
+	for index, link in enumerate(episodeLinks, start=1):
 		browser.get(link)
 		print "Getting " + browser.title.split("-")[0]
 		videoTag = browser.find_element(By.TAG_NAME, "video")
 		print "Link: " + videoTag.get_attribute("src")
-		downloadFile(idmPath, videoTag.get_attribute("src"), folderName, browser.title.split(" -")[0] + ".mp4")
+		downloadFile(idmPath, videoTag.get_attribute("src"), folderName, folderName + " " + str(index) + ".mp4")
 
 def downloadFile(idmPath, downloadLink, folder, fileName):
 		call([idmPath, "/d", downloadLink, "/n", "/s", "/f", fileName])
 
 def kissAnime(browser, mainLink):
 	browser.get(mainLink)
-	folderName = browser.find_element_by_class_name("bigChar").text
+	folderName = mainLink[::-1].split("/")[0][::-1]
 
 	episodeTable = browser.find_elements_by_class_name("listing")[0].find_elements(By.TAG_NAME, "a")
 
@@ -45,12 +47,12 @@ def kissAnime(browser, mainLink):
 	for rows in episodeTable:
 		episodeLinks.append(rows.get_attribute("href"))
 
-	for link in episodeLinks:
+	for index, link in enumerate(episodeLinks, start=1):
 		browser.get(link)
-		print "Getting " + browser.title.split("-")[0]
+		print "Getting " + folderName
 		videoTag = browser.find_element(By.TAG_NAME, "video")
 		print "Link: " + videoTag.get_attribute("src")
-		downloadFile(idmPath, videoTag.get_attribute("src"), folderName, browser.title.split(" -")[0] + ".mp4")
+		downloadFile(idmPath, videoTag.get_attribute("src"), folderName, folderName + " " + str(index) + ".mp4")
 
 if __name__ == "__main__":
 	showURL = sys.argv[1]
@@ -72,6 +74,5 @@ if __name__ == "__main__":
 		kissDrama(browser, showURL);
 
 	browser.quit()
-
 
 
